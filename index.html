@@ -1,31 +1,160 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lite Editor</title><link rel="stylesheet" href="style.css"></head>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurora Cut — Browser Video Editor</title>
+<link rel="stylesheet" href="style.css">
+<base target="_blank">
+</head>
 <body>
-<header><b>Lite Editor</b>
-<button id="bNew" title="New project">New</button><button id="bSave" title="Save project">Save</button><button id="bLoad" title="Load project">Load</button>
-<button id="bUndo" title="Undo (Ctrl+Z)">Undo</button><button id="bRedo" title="Redo (Ctrl+Y)">Redo</button>
-<button id="bExp" title="Export video">Export</button><button id="bTheme" title="Switch light/dark theme">Theme</button></header>
-<main>
-<aside><h3>Media</h3>
-<label class="drop" id="drop">Drop files here or click to import<input id="file" type="file" multiple accept="video/*,image/*,audio/*" hidden></label>
-<div id="items"></div><video id="pv" controls hidden></video><img id="pi" hidden alt="">
-<h3>Add</h3><button id="bText">Text</button> <button id="bShape">Shape</button>
-<h3>Storage</h3><div id="store"></div></aside>
-<section id="stage"><canvas id="cv" width="1280" height="720"></canvas>
-<div class="bar"><button id="bPlay" title="Play / pause (Space)">Play</button><span id="time">0:00.0 / 0:01.0</span><input id="vol" type="range" min="0" max="1" step=".01" value="1" title="Preview volume"><button id="bFs">Fullscreen</button></div></section>
-<aside id="pf"></aside>
-</main>
-<section id="tl"><div class="tbar"><button id="bSplit" title="Split at playhead (S)">Split</button><button id="bDup">Duplicate</button><button id="bDel" title="Delete (Del)">Delete</button><label>Zoom <input id="zoom" type="range" min="10" max="200" value="50"></label></div>
-<div id="tracks"><div id="inner"></div></div></section>
-<dialog id="xd"><h3>Export</h3>
-<label>Resolution <select id="xr"><option value="0">Original</option><option>1080</option><option selected>720</option><option>480</option><option>360</option><option>240</option></select></label>
-<label>FPS <select id="xf"><option>24</option><option selected>30</option><option>60</option></select></label>
-<label>Quality <select id="xq"><option value=".04">Low</option><option value=".08" selected>Medium</option><option value=".16">High</option></select></label>
-<label><input id="xa" type="checkbox" checked> Include audio</label>
-<p>Exports play through in real time.</p><progress id="xp" value="0" max="1" hidden></progress>
-<div><button id="xgo">Start export</button> <button id="xcx">Close</button></div></dialog>
-<dialog id="pd"><h3>Projects</h3><div id="pl"></div><button id="pc">Close</button></dialog>
-<div id="toast" hidden></div>
+
+<header id="topbar">
+  <div class="tb-group brand">
+    <span class="logo">✦</span>
+    <input id="projName" value="Untitled Project" spellcheck="false" title="Project name">
+  </div>
+  <div class="tb-group">
+    <button id="newBtn" class="tbtn" title="New project">New</button>
+    <button id="saveBtn" class="tbtn" title="Save project">Save</button>
+    <button id="projectsBtn" class="tbtn" title="Load project">Projects</button>
+  </div>
+  <div class="tb-group">
+    <button id="undoBtn" class="tbtn" title="Undo (Ctrl+Z)">↶</button>
+    <button id="redoBtn" class="tbtn" title="Redo (Ctrl+Y)">↷</button>
+  </div>
+  <div class="tb-group">
+    <button id="addTextBtn" class="tbtn" title="Add text overlay">T+</button>
+    <button id="shapeRect" class="tbtn" title="Rectangle shape">▭</button>
+    <button id="shapeRound" class="tbtn" title="Rounded rectangle">▢</button>
+    <button id="shapeCircle" class="tbtn" title="Ellipse shape">◯</button>
+    <button id="shapeTri" class="tbtn" title="Polygon shape">⬡</button>
+  </div>
+  <div class="tb-group grow"></div>
+  <div class="tb-group">
+    <button id="leftToggle" class="tbtn only-mobile" title="Toggle library">☰</button>
+    <button id="themeBtn" class="tbtn" title="Toggle theme">☾</button>
+    <button id="exportBtn" class="tbtn primary" title="Export video">Export</button>
+    <button id="rightToggle" class="tbtn only-mobile" title="Toggle properties">⚙</button>
+  </div>
+</header>
+
+<div id="workspace">
+  <aside id="left">
+    <div class="tabs">
+      <button class="tab active" data-tab="media">Media</button>
+      <button class="tab" data-tab="storage">Storage</button>
+    </div>
+    <section id="tab-media" class="tabpage active">
+      <div class="import-row">
+        <button id="importBtn" class="btn wide">＋ Import media</button>
+        <input type="file" id="fileInput" accept="video/*,audio/*,image/*" multiple hidden>
+      </div>
+      <div id="library" class="library">
+        <div class="empty">Drop video, audio or images here<br><span>MP4 · WebM · PNG · MP3…</span></div>
+      </div>
+      <div id="mediaPreview" class="media-preview hidden">
+        <video id="mpVideo" controls muted playsinline hidden></video>
+        <audio id="mpAudio" controls hidden></audio>
+        <img id="mpImg" hidden alt="">
+        <div id="mpName" class="mp-name"></div>
+        <div class="mp-actions">
+          <button id="mpAdd" class="btn">＋ Timeline</button>
+          <button id="mpOverlay" class="btn" hidden>＋ Overlay</button>
+        </div>
+      </div>
+    </section>
+    <section id="tab-storage" class="tabpage">
+      <div id="storageInfo" class="storage-info"></div>
+      <div class="storage-btns">
+        <button id="clearTemp" class="btn danger">Clear temp videos</button>
+        <button id="clearAll" class="btn danger">Clear all cached media</button>
+      </div>
+    </section>
+  </aside>
+
+  <main id="center">
+    <div id="stage">
+      <canvas id="view" width="1280" height="720"></canvas>
+      <div id="stageHint" class="stage-hint">Import media, then press ▶ — or drop files anywhere</div>
+    </div>
+    <div id="transport">
+      <button id="playBtn" class="tbtn big" title="Play / pause (Space)">▶</button>
+      <span id="timeCur" class="time">0:00.0</span>
+      <input type="range" id="seek" min="0" max="10" step="0.01" value="0" title="Seek">
+      <span id="timeDur" class="time">0:00.0</span>
+      <span class="vol-wrap" title="Preview volume"><input type="range" id="vol" min="0" max="1" step="0.01" value="1"></span>
+      <button id="fsBtn" class="tbtn" title="Fullscreen preview">⛶</button>
+    </div>
+  </main>
+
+  <aside id="right">
+    <div id="panel"></div>
+  </aside>
+</div>
+
+<div id="timeline-wrap">
+  <div id="tl-toolbar">
+    <div class="tb-group">
+      <button id="tlZoomOut" class="tbtn" title="Zoom out">−</button>
+      <span id="zoomLabel" class="time">60 px/s</span>
+      <button id="tlZoomIn" class="tbtn" title="Zoom in">＋</button>
+    </div>
+    <div class="tb-group">
+      <button id="splitBtn" class="tbtn" title="Split at playhead (S)">✂ Split</button>
+      <button id="dupBtn" class="tbtn" title="Duplicate (Ctrl+D)">⧉ Duplicate</button>
+      <button id="delBtn" class="tbtn danger" title="Delete (Del)">🗑 Delete</button>
+    </div>
+  </div>
+  <div id="tlScroll">
+    <div id="tlInner">
+      <canvas id="ruler" height="26"></canvas>
+      <div id="kfLane"></div>
+      <div id="tracks"></div>
+      <div id="playhead"></div>
+    </div>
+  </div>
+</div>
+
+<div id="exportModal" class="modal hidden">
+  <div class="modal-card">
+    <h2>Export video</h2>
+    <div class="form-row"><label>Resolution</label>
+      <select id="expRes">
+        <option value="original">Original</option>
+        <option value="1080">1080p</option>
+        <option value="720">720p</option>
+        <option value="480">480p</option>
+        <option value="360">360p</option>
+        <option value="240">240p</option>
+      </select>
+    </div>
+    <div class="form-row"><label>FPS</label>
+      <select id="expFps"><option>24</option><option selected>30</option><option>60</option></select>
+    </div>
+    <div class="form-row"><label>Quality</label>
+      <select id="expQ"><option value="2">Low</option><option value="6" selected>Medium</option><option value="12">High</option></select>
+    </div>
+    <div class="form-row"><label>Audio</label><input type="checkbox" id="expAudio" checked></div>
+    <div id="expProgressWrap" class="hidden">
+      <div class="progress"><div id="expBar"></div></div>
+      <div id="expStatus" class="muted">Rendering in real time — keep this tab focused…</div>
+    </div>
+    <div class="modal-btns">
+      <button id="expCancel" class="btn">Cancel</button>
+      <button id="doExport" class="btn primary">Start export</button>
+    </div>
+  </div>
+</div>
+
+<div id="projectsModal" class="modal hidden">
+  <div class="modal-card">
+    <h2>Projects</h2>
+    <div id="projList" class="proj-list"></div>
+    <div class="modal-btns"><button id="projClose" class="btn">Close</button></div>
+  </div>
+</div>
+
 <script src="script.js"></script>
-</body></html>
+</body>
+</html>
