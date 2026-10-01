@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lite Editor</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><b>Lite Editor</b>
+<button id="bNew" title="New project">New</button><button id="bSave" title="Save project">Save</button><button id="bLoad" title="Load project">Load</button>
+<button id="bUndo" title="Undo (Ctrl+Z)">Undo</button><button id="bRedo" title="Redo (Ctrl+Y)">Redo</button>
+<button id="bExp" title="Export video">Export</button><button id="bTheme" title="Switch light/dark theme">Theme</button></header>
+<main>
+<aside><h3>Media</h3>
+<label class="drop" id="drop">Drop files here or click to import<input id="file" type="file" multiple accept="video/*,image/*,audio/*" hidden></label>
+<div id="items"></div><video id="pv" controls hidden></video><img id="pi" hidden alt="">
+<h3>Add</h3><button id="bText">Text</button> <button id="bShape">Shape</button>
+<h3>Storage</h3><div id="store"></div></aside>
+<section id="stage"><canvas id="cv" width="1280" height="720"></canvas>
+<div class="bar"><button id="bPlay" title="Play / pause (Space)">Play</button><span id="time">0:00.0 / 0:01.0</span><input id="vol" type="range" min="0" max="1" step=".01" value="1" title="Preview volume"><button id="bFs">Fullscreen</button></div></section>
+<aside id="pf"></aside>
+</main>
+<section id="tl"><div class="tbar"><button id="bSplit" title="Split at playhead (S)">Split</button><button id="bDup">Duplicate</button><button id="bDel" title="Delete (Del)">Delete</button><label>Zoom <input id="zoom" type="range" min="10" max="200" value="50"></label></div>
+<div id="tracks"><div id="inner"></div></div></section>
+<dialog id="xd"><h3>Export</h3>
+<label>Resolution <select id="xr"><option value="0">Original</option><option>1080</option><option selected>720</option><option>480</option><option>360</option><option>240</option></select></label>
+<label>FPS <select id="xf"><option>24</option><option selected>30</option><option>60</option></select></label>
+<label>Quality <select id="xq"><option value=".04">Low</option><option value=".08" selected>Medium</option><option value=".16">High</option></select></label>
+<label><input id="xa" type="checkbox" checked> Include audio</label>
+<p>Exports play through in real time.</p><progress id="xp" value="0" max="1" hidden></progress>
+<div><button id="xgo">Start export</button> <button id="xcx">Close</button></div></dialog>
+<dialog id="pd"><h3>Projects</h3><div id="pl"></div><button id="pc">Close</button></dialog>
+<div id="toast" hidden></div>
+<script src="script.js"></script>
+</body></html>
